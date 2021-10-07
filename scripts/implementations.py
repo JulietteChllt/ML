@@ -25,7 +25,7 @@ def compute_gradient(y, tx, w):
     return grad, e
 
 
-def leastsquaresGD(y, tx, initial_w, max_iters, gamma):
+def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     w = initial_w
     loss = 0
     for n_iter in range(max_iters):
