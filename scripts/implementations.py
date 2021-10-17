@@ -44,6 +44,7 @@ def compute_stoch_gradient(y, tx, w):
     return grad, e
 
 
+# given function
 def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
 
     data_size = len(y)
