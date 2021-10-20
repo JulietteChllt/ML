@@ -24,6 +24,9 @@ def compute_gradient(y, tx, w):
     grad = -tx.T.dot(e) / len(e)
     return grad, e
 
+def sigmoid(z):
+    return 1/(1+np.exp(-z))
+
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     w = initial_w
@@ -88,3 +91,20 @@ def ridge_regression(y, tx, lambda_):
     b = tx.T.dot(y)
     w = np.linalg.solve(a, b)
     return w, compute_loss(y, tx, w)
+
+
+#will most likely make your kernel die ... 
+def logistic_regression(y, tx, initial_w, max_iters, gamma):
+    ws = [initial_w]
+    losses = []
+    w = initial_w
+    for n_iter in range(max_iters):
+        z = np.dot(tx, w)
+        h = sigmoid(z)
+        gd = np.dot(tx.T, (h - y)) 
+        w -= gamma * gd
+        loss = np.squeeze(-(np.dot(y.T,np.log(z)) + np.dot((1 - y).T,np.log(1 - z))))
+        ws.append(w)
+        losses.append(loss)
+        
+    return w,loss
