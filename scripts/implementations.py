@@ -1,8 +1,6 @@
 import numpy as np
 
 
-###### Proposition Augustin ########
-
 def MSE(e):
     return np.mean(e**2)/2
 
@@ -23,9 +21,6 @@ def compute_gradient(y, tx, w):
     e = y - tx.dot(w)
     grad = -tx.T.dot(e) / len(e)
     return grad, e
-
-def sigmoid(z):
-    return 1/(1+np.exp(-z))
 
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
@@ -93,18 +88,57 @@ def ridge_regression(y, tx, lambda_):
     return w, compute_loss(y, tx, w)
 
 
-#will most likely make your kernel die ... 
+# # will most likely make your kernel die ...
+# def logistic_regression(y, tx, initial_w, max_iters, gamma):
+#     ws = [initial_w]
+#     losses = []
+#     w = initial_w
+#     for n_iter in range(max_iters):
+#         z = np.dot(tx, w)
+#         h = sigmoid(z)
+#         gd = np.dot(tx.T, (h - y))
+#         w -= gamma * gd
+#         loss = np.squeeze(-(np.dot(y.T, np.log(z)) +
+#                             np.dot((1 - y).T, np.log(1 - z))))
+#         ws.append(w)
+#         losses.append(loss)
+
+#     return w, loss
+
+
+# ---- logistic regression ----
+
+def sigmoid(z):
+    return 1/(1+np.exp(-z))
+
+
+def calculate_loss_negative_likelihood(y, tx, w):
+    """compute the loss: negative log likelihood."""
+    pred = sigmoid(tx.dot(w))
+    loss = y.T.dot(np.log(pred)) + (1 - y).T.dot(np.log(1 - pred))
+    return -np.sum(loss)
+
+
+def calculate_gradient_sigmoid(y, tx, w):
+    """compute the gradient of loss."""
+    pred = sigmoid(tx.dot(w))
+    return tx.T.dot(pred - y)
+
+
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
-    ws = [initial_w]
-    losses = []
     w = initial_w
-    for n_iter in range(max_iters):
-        z = np.dot(tx, w)
-        h = sigmoid(z)
-        gd = np.dot(tx.T, (h - y)) 
-        w -= gamma * gd
-        loss = np.squeeze(-(np.dot(y.T,np.log(z)) + np.dot((1 - y).T,np.log(1 - z))))
-        ws.append(w)
-        losses.append(loss)
-        
-    return w,loss
+    for iter in range(max_iters):
+        grad = calculate_gradient_sigmoid(y, tx, w)
+        w = w - grad * gamma
+    return w, calculate_loss_negative_likelihood(y, tx, w)
+
+
+# ---- logistic regression regularized ----
+
+
+def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
+    w = initial_w
+    for iter in range(max_iters):
+        grad = calculate_gradient_sigmoid(y, tx, w) + 2 * lambda_ * w
+        w = w - gamma * grad
+    return w, calculate_loss_negative_likelihood(y, tx, w)
