@@ -3,7 +3,7 @@
 import csv
 import numpy as np
 
-
+#load data from csv file
 def load_csv_data(data_path, sub_sample=False):
     """Loads data and returns y (class labels), tX (features) and ids (event ids)"""
     y = np.genfromtxt(data_path, delimiter=",", skip_header=1, dtype=str, usecols=1)
@@ -23,16 +23,16 @@ def load_csv_data(data_path, sub_sample=False):
 
     return yb, input_data, ids
 
-#to change angain !!!!!
+#change 0 to 0.5 when doing Logistic Regression
 def predict_labels(weights, data):
     """Generates class predictions given weights, and a test data matrix"""
     y_pred = np.dot(data, weights)
-    y_pred[np.where(y_pred <= 0.5)] = -1
-    y_pred[np.where(y_pred > 0.5)] = 1
+    y_pred[np.where(y_pred <= 0)] = -1
+    y_pred[np.where(y_pred > 0)] = 1
     
     return y_pred
 
-
+#create submission file 
 def create_csv_submission(ids, y_pred, name):
     """
     Creates an output file in .csv format for submission to Kaggle or AIcrowd

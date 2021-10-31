@@ -1,26 +1,20 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
-
-
 import numpy as np
 from numpy import genfromtxt
 import math
 from proj1_helpers import *
-from sklearn.preprocessing import PolynomialFeatures
 import seaborn as sns
 
 
-# In[1]:
-
-
+#load the data from the csv file
 class LoadTrainingDataset():
     
     def __init__(self,path):
         #we keep 0 & 1 if we use Logistic Regression otherwise we can take 1 ; -1 to
         #follow the professor predict_label() method convention
-        my_dict = {'s': 1, 'b': 0}
+        my_dict = {'s': 1, 'b': -1}
         self.y = np.loadtxt(path, delimiter=",",dtype=np.str_,skiprows=1,usecols=1) 
         self.y = np.array([my_dict[i] for i in self.y])
         self.y = self.y.reshape(self.y.shape[0],1)
@@ -38,10 +32,8 @@ class LoadTrainingDataset():
     def get_data(self):
         return self.x , self.y ,self.ids
 
-
-# In[ ]:
-
-
+    
+#load the training set from the csv 
 class LoadTestingDataset():
     
     def __init__(self,path):
@@ -59,10 +51,8 @@ class LoadTestingDataset():
     def get_data(self):
         return self.x , self.ids
 
-
-# In[4]:
-
-
+    
+#separate the data in 3 batches based on the the value of the PRI_jet_num
 def separate_data(tx,y,ids):
     
     array_1 = np.where( (tx[:,22]!=0))[0]
@@ -83,9 +73,7 @@ def separate_data(tx,y,ids):
     return (tx_1,y_1,ids_1) , (tx_2,y_2,ids_2) , (tx_3,y_3,ids_3)
 
 
-# In[5]:
-
-
+#remove columns that contain 1 single value for each event (-999, 0 or 1)
 def adapt_features(data_n):
     
     tx_n = data_n[0]
@@ -99,9 +87,7 @@ def adapt_features(data_n):
     return (tx_n,data_n[1],data_n[2]),indexes
 
 
-# In[8]:
-
-
+#replace punctual -999 values with the median of the other values of the feature
 def add_median(data_n):
     
     tx_n = data_n[0]
@@ -114,9 +100,7 @@ def add_median(data_n):
     return (tx_n,data_n[1],data_n[2])
 
 
-# In[10]:
-
-
+#check for highly correlated features and remove features that are more than 80% correlated
 def dimensionality_reduction_corr(data_n):
     
     tx_n = data_n[0]
@@ -128,33 +112,7 @@ def dimensionality_reduction_corr(data_n):
     return (tx_n,data_n[1],data_n[2]),indexes
 
 
-# In[73]:
-
-
-def dimensionality_reduction_PCA(data_n,k):
-    
-    # Compare performance with dimen reduc correlation first
-    tx_n = data_n[0]
-    #standardize the data 
-    tx_n = (tx_n - np.mean(tx_n, axis=0))/np.std(tx_n, axis=0)
-    #compute covariance matrix 
-    cov = np.cov(tx_n.T)
-    #find eighenvalues and eighenvector
-    ei_val, ei_vect = np.linalg.eig(cov)
-    # Make list of tuples and sort in decreasing eighenvalue order 
-    ei_tuple = [(np.abs(ei_val[i]), ei_vect[:, i]) for i in range(len(ei_val))]
-    ei_tuple.sort(key = lambda k: k[0], reverse = True)
-    #Keep the eighenvectors corresponding to the K largest eighenvalues (TRADE-OFF TO BE MADE)
-    ei_tuple_largest = ei_tuple[:k]
-    #Construct a projection matrix W from the these eigenvectors
-    w = np.stack([vec for val, vec in ei_tuple_largest], axis=1)
-
-    return (ei_tuple, ei_tuple_largest,w)
-
-
-# In[1]:
-
-
+#feature expansion without pairwise products 
 def expand_without_pairwise_products(X,M) :
     
     ans = np.ones((X.shape[0],1))
@@ -164,9 +122,7 @@ def expand_without_pairwise_products(X,M) :
     return ans
 
 
-# In[2]:
-
-
+#feature expansion with pairwise products 
 def expand_with_pairwise_products(X, M):
     
     without_pairwise_products = expand_without_pairwise_products(X,M)
@@ -184,19 +140,16 @@ def expand_with_pairwise_products(X, M):
     return np.concatenate((without_pairwise_products, interactions), axis=1)
 
 
-# In[ ]:
-
-
-def add_bias(X):
+#add a bias which is an all one vector
+def add_bias(X): 
     
-    X =np.append(X, np.ones(shape=(X.shape[0],1)), axis=1)
+    X =np.append(X, np.ones(shape=(X.shape[0],1)), axis=1) 
     
     return (X)
 
 
-# In[2]:
-
-
+#standardizing and applying log function on skew values, then normalizing the data
+#the parameters are kept to be reapplied on test set
 def scale_transform(data_n,skewed):
     
     tx_n = data_n[0]
@@ -216,9 +169,7 @@ def scale_transform(data_n,skewed):
     return data_n,parameters
 
 
-# In[ ]:
-
-
+#standardize, apply log and normalize test set with the same parameters as the train set
 def scale_transform_test(data_n,parameters):
     
     xtest_n = data_n[0]
@@ -230,9 +181,6 @@ def scale_transform_test(data_n,parameters):
     data_n = (std_data,data_n[1],data_n[2])
     
     return (std_data,data_n[1],data_n[2])
-
-
-# In[ ]:
 
 
 #Put it all together for training data
@@ -247,7 +195,7 @@ def process_data(path) :
     data_1,indexes1 = adapt_features(data_1)
     data_2,indexes2 = adapt_features(data_2)
     data_3,indexes3 = adapt_features(data_3)
-    #replace -999 coefficients with the mediane of the column (-999 coefficients discared)
+    #replace -999 coefficients with the median of the column (-999 coefficients discared)
     data_1 = add_median(data_1)
     data_2 = add_median(data_2)
     data_3 = add_median(data_3)
@@ -281,8 +229,6 @@ def process_data(path) :
     parameters = (parameters1,parameters2,parameters3)
     return data_1, data_2, data_3 , indexes , parameters
 
-
-# In[ ]:
 
 
 #Put it all together for testing data
@@ -318,7 +264,6 @@ def process_test(path,indexes,parameters):
     data_2 = (xtest2,data_2[1],data_2[2])
     data_3 = (xtest3,data_3[1],data_3[2])
     
-
     #Log Transform skewed Data, scaling and normalizing using the same parameters of the training set
     skewed1 = [2,4,6,10,15]
     skewed2 = [2,3,5,7,10,13,15]
