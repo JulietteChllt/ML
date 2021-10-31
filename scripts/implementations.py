@@ -90,35 +90,7 @@ def ridge_regression(y, tx, lambda_):
 
 # ---- logistic regression ----
 
-def sigmoid(z):
-    return 1/(1+np.exp(-z))
-
-
-def calculate_loss_negative_likelihood(y, tx, w):
-    """compute the loss: negative log likelihood."""
-    pred = sigmoid(tx.dot(w))
-    loss = y.T.dot(np.log(pred)) + (1 - y).T.dot(np.log(1 - pred))
-    return -np.sum(loss)
-
-
-def calculate_gradient_sigmoid(y, tx, w):
-    """compute the gradient of loss."""
-    pred = sigmoid(tx.dot(w))
-    return tx.T.dot(pred - y)
-
-
-def logsig_log1pexp(t):
-    
-    (array1,array2,array3,array4) =(np.where(t<-33.3),np.where(((t<= -18) & (t>=-33.3))),np.where(((t<= 37) & (t>-18))),np.where(t >37))
-    tmp = np.ones(shape = t.shape)
-    tmp[array1]=t[array1]
-    tmp[array2]=t[array2]-np.exp(t[array2])
-    tmp[array3]=-np.log1p(np.exp(-t[array3]))
-    tmp[array4]=-np.exp(-t[array4])
-    return tmp
-
-
-def logsig(x):
+def log_of_sigmoid(x):
     out = np.zeros_like(x)
     idx0 = x < -33
     out[idx0] = x[idx0]
@@ -131,13 +103,15 @@ def logsig(x):
     return out
 
 
+#Optimized negative log-likelihood function (using log_of_sigmoid optimisations)
 def calculate_loss(x, A, b):
 
-    z = np.dot(A, x)
-    b = np.asarray(b)
-    return np.mean((1 - b) * z - logsig(z))
+    z = np.dot(tx, w)
+    y = np.asarray(y)
+    return np.mean((1 - y) * z - log_of_sigmoid(z))
 
-def expit_b(x, b):
+#Logistic sigmoid function (inverse of the logit function)
+def expit_y(y_pred, y):
     idx = x < 0
     out = np.zeros_like(x)
     exp_x = np.exp(x[idx])
@@ -149,11 +123,11 @@ def expit_b(x, b):
     return out
 
 
-def calculate_gradient(x, A, b):
-
-    z = A.dot(x)
-    s = expit_b(z, b)
-    return A.T.dot(s) / A.shape[0] 
+#Optimized Gradient Descent for logistic regression (using expit function)
+def calculate_gradient(w, tx, y):
+    y_pred = tx.dot(w)
+    s = expit_y(y_pred, y)
+    return tx.T.dot(s) / tx.shape[0] 
 
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
     # init parameters
@@ -170,17 +144,14 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
 
         losses.append(loss)
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
-            print("I converged after this amount of iterations:",n_iter)
+            print("converged after this amount of iterations:",n_iter)
             break
             
     return w.squeeze(),loss
 
 
-# ---- logistic regression regularized ----
-
-
 def reg_logistic_regression(y, tx, lambda_ ,initial_w, max_iters, gamma):    
-    threshold = 1e-8
+    threshold = 1e-4
     losses = []
     w = initial_w
   
