@@ -103,15 +103,17 @@ def log_of_sigmoid(x):
     return out
 
 
-#Optimized negative log-likelihood function (using log_of_sigmoid optimisations)
-def calculate_loss(x, A, b):
+# Optimized negative log-likelihood function (using log_of_sigmoid optimisations)
+def calculate_loss_likelihood(w, tx, y):
 
     z = np.dot(tx, w)
     y = np.asarray(y)
     return np.mean((1 - y) * z - log_of_sigmoid(z))
 
-#Logistic sigmoid function (inverse of the logit function)
-def expit_y(y_pred, y):
+# Logistic sigmoid function (inverse of the logit function)
+
+
+def expit_y(x, b):
     idx = x < 0
     out = np.zeros_like(x)
     exp_x = np.exp(x[idx])
@@ -123,11 +125,12 @@ def expit_y(y_pred, y):
     return out
 
 
-#Optimized Gradient Descent for logistic regression (using expit function)
-def calculate_gradient(w, tx, y):
+# Optimized Gradient Descent for logistic regression (using expit function)
+def calculate_gradient_sigmoid(w, tx, y):
     y_pred = tx.dot(w)
     s = expit_y(y_pred, y)
-    return tx.T.dot(s) / tx.shape[0] 
+    return tx.T.dot(s) / tx.shape[0]
+
 
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
     # init parameters
@@ -137,30 +140,31 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
 
     # start the logistic regression
     for n_iter in range(max_iters):
-        loss = calculate_loss(w, tx, y)
-        gradient  = calculate_gradient(w, tx, y)
+        loss = calculate_loss_likelihood(w, tx, y)
+        gradient = calculate_gradient_sigmoid(w, tx, y)
         print(loss)
-        w= w - gamma*gradient
+        w = w - gamma*gradient
 
         losses.append(loss)
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
-            print("converged after this amount of iterations:",n_iter)
+            print("converged after this amount of iterations:", n_iter)
             break
-            
-    return w.squeeze(),loss
+
+    return w.squeeze(), loss
 
 
-def reg_logistic_regression(y, tx, lambda_ ,initial_w, max_iters, gamma):    
+def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     threshold = 1e-4
     losses = []
     w = initial_w
-  
+
     for iter in range(max_iters):
-        loss = calculate_loss(y, tx, w) + lambda_ * np.squeeze(w.T.dot(w))
-        gradient = calculate_gradient(y, tx, w) + 2 * lambda_ * w
-        w= w - gamma*gradient
+        loss = calculate_loss_likelihood(
+            y, tx, w) + lambda_ * np.squeeze(w.T.dot(w))
+        gradient = calculate_gradient_sigmoid(y, tx, w) + 2 * lambda_ * w
+        w = w - gamma*gradient
         losses.append(loss)
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
             break
-            
-    return w.squeeze(),loss
+
+    return w.squeeze(), loss
