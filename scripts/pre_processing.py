@@ -174,18 +174,27 @@ def scale_transform(data_n,skewed):
     return data_n,parameters
 
 
-# standardize, apply log and normalize test set with the same parameters as the train set
-def scale_transform_test(data_n, parameters):
-
+#scaling, applying log transformation and normalizing based on training parameters
+def scale_transform_test(data_n,parameters,skewed):
     xtest_n = data_n[0]
-    dividor = np.max(xtest_n, axis=0)-np.min(xtest_n, axis=0)
-    xtest_n = (xtest_n - np.min(xtest_n, axis=0))/dividor
-    xtest_n = np.log(1+xtest_n)
-    centered_data = xtest_n - np.mean(xtest_n, axis=0)
-    std_data = centered_data / np.std(centered_data, axis=0)
-    data_n = (std_data, data_n[1], data_n[2])
-
-    return (std_data, data_n[1], data_n[2])
+    minimum = parameters[0]
+    maximum = parameters[1]
+    mean = parameters[2]
+    std = parameters[3]
+    dividor = maximum-minimum   
+    xtest_n = (xtest_n - minimum)/dividor
+    
+    if (skewed):
+        xtest_n[:,skewed]= np.log(xtest_n[:,skewed]+1)
+    
+    
+    centered_data = xtest_n - mean    
+    
+    std_data = centered_data / std
+    
+    data_n = (std_data,data_n[1],data_n[2])
+    
+    return (std_data,data_n[1],data_n[2])
 
 
 # Put it all together for training data
