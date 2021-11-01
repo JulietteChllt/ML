@@ -1,7 +1,7 @@
 # Machine Learning Project 1 : Higgs Boson
 
 This machine learning project makes predictions on a data set of Higgs Boson particules.
-The data set can be found at this [&lt;address&gt;]("https://www.aicrowd.com/challenges/epfl-machine-learning-higgs").
+The data set can be found at this [address](https://www.aicrowd.com/challenges/epfl-machine-learning-higgs).
 
 ## Pre processing of the data
 
