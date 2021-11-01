@@ -18,19 +18,19 @@ def main():
 
     print("Expansion on data.")
 
-    x_train_1 = expand_with_pairwise_products(tx_1, 10)
-    x_train_2 = expand_with_pairwise_products(tx_2, 12)
-    x_train_3 = expand_with_pairwise_products(tx_3, 12)
+    x_train_1 = expand_with_pairwise_products(tx_1, 12)
+    x_train_2 = expand_with_pairwise_products(tx_2, 14)
+    x_train_3 = expand_with_pairwise_products(tx_3, 13)
 
-    x_test_1 = expand_with_pairwise_products(xtest_1, 10)
-    x_test_2 = expand_with_pairwise_products(xtest_2, 12)
-    x_test_3 = expand_with_pairwise_products(xtest_3, 12)
+    x_test_1 = expand_with_pairwise_products(xtest_1, 12)
+    x_test_2 = expand_with_pairwise_products(xtest_2, 14)
+    x_test_3 = expand_with_pairwise_products(xtest_3, 13)
 
     print("Model tuning with ridge regression.")
 
-    w1, l1 = imp.ridge_regression(y_1, x_train_1, 0.0001)
-    w2, l2 = imp.ridge_regression(y_2, x_train_2, 0.0004124626382901352)
-    w3, l3 = imp.ridge_regression(y_3, x_train_3, 0.0008376776400682916)
+    w1, l1 = imp.ridge_regression(y_1, x_train_1, 0.0001603718743751331)
+    w2, l2 = imp.ridge_regression(y_2, x_train_2, 0.0001603718743751331)
+    w3, l3 = imp.ridge_regression(y_3, x_train_3, 0.002154434690031882)
 
     print("Prediction of the test.")
 
