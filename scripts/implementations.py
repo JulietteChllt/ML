@@ -142,12 +142,10 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
     for n_iter in range(max_iters):
         loss = calculate_loss_likelihood(w, tx, y)
         gradient = calculate_gradient_sigmoid(w, tx, y)
-        print(loss)
         w = w - gamma*gradient
 
         losses.append(loss)
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
-            print("converged after this amount of iterations:", n_iter)
             break
 
     return w.squeeze(), loss
