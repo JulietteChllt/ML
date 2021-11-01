@@ -157,9 +157,8 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     w = initial_w
 
     for iter in range(max_iters):
-        loss = calculate_loss_likelihood(
-            y, tx, w) + lambda_ * np.squeeze(w.T.dot(w))
-        gradient = calculate_gradient_sigmoid(y, tx, w) + 2 * lambda_ * w
+        loss = calculate_loss_likelihood(w, tx, y) + lambda_ * np.squeeze(w.T.dot(w))
+        gradient = calculate_gradient_sigmoid(w, tx, y) + 2 * lambda_ * w
         w = w - gamma*gradient
         losses.append(loss)
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
