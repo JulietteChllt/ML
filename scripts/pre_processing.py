@@ -245,44 +245,45 @@ def process_data(path):
 
 
 # Put it all together for testing data
-def process_test(path, indexes, parameters):
-    # load the initial test set
+def process_test(path,indexes,parameters):
+    #load the initial test set 
     test_data = LoadTestingDataset(path)
-    # extract features and ids
-    tX_test, ids_test = test_data.get_data()
-    # separate data into 3 categories according to the PRI_JEST_NUM
-    y = np.ones((tX_test.shape[0], 1))
-    data_1, data_2, data_3 = separate_data(tX_test, y, ids_test)
-    # remove column that have been dropped during test phase
-    xtest1 = data_1[0]
-    xtest1 = np.delete(xtest1, indexes[0], 1)
-    xtest2 = data_2[0]
-    xtest2 = np.delete(xtest2, indexes[1], 1)
+    #extract features and ids
+    tX_test, ids_test = test_data.get_data()  
+    #separate data into 3 categories according to the PRI_JEST_NUM 
+    y = np.ones((tX_test.shape[0],1))
+    data_1,data_2,data_3 = separate_data(tX_test,y,ids_test)
+    #remove column that have been dropped during test phase
+    xtest1 = data_1[0] 
+    xtest1 = np.delete(xtest1,indexes[0],1)
+    xtest2 = data_2[0] 
+    xtest2 = np.delete(xtest2,indexes[1],1)
     xtest3 = data_3[0]
-    xtest3 = np.delete(xtest3, indexes[2], 1)
-    data_1 = (xtest1, data_1[1], data_1[2])
-    data_2 = (xtest2, data_2[1], data_2[2])
-    data_3 = (xtest3, data_3[1], data_3[2])
+    xtest3 = np.delete(xtest3,indexes[2],1)
+    data_1 = (xtest1,data_1[1],data_1[2])
+    data_2 = (xtest2,data_2[1],data_2[2])
+    data_3 = (xtest3,data_3[1],data_3[2])
     data_1 = add_median(data_1)
     data_2 = add_median(data_2)
-    data_3 = add_median(data_3)
-    # dimentionality reduction : remove column that are strongly correlated (according to the training set analysis)
-    xtest1 = data_1[0]
-    xtest1 = np.delete(xtest1, indexes[3], 1)
-    xtest2 = data_2[0]
-    xtest2 = np.delete(xtest2, indexes[4], 1)
+    data_3 = add_median(data_3)  
+    #dimentionality reduction : remove column that are strongly correlated (according to the training set analysis)
+    xtest1 = data_1[0] 
+    xtest1 = np.delete(xtest1,indexes[3],1)
+    xtest2 = data_2[0] 
+    xtest2 = np.delete(xtest2,indexes[4],1)
     xtest3 = data_3[0]
-    xtest3 = np.delete(xtest3, indexes[5], 1)
-    data_1 = (xtest1, data_1[1], data_1[2])
-    data_2 = (xtest2, data_2[1], data_2[2])
-    data_3 = (xtest3, data_3[1], data_3[2])
+    xtest3 = np.delete(xtest3,indexes[5],1)
+    data_1 = (xtest1,data_1[1],data_1[2])
+    data_2 = (xtest2,data_2[1],data_2[2])
+    data_3 = (xtest3,data_3[1],data_3[2])
+    
 
-    # Log Transform skewed Data, scaling and normalizing using the same parameters of the training set
-    skewed1 = [2, 4, 6, 10, 15]
-    skewed2 = [2, 3, 5, 7, 10, 13, 15]
-    skewed3 = [1, 2, 3, 4, 7, 8, 11, 14, 17, 22]
-    data_1, parameters1 = scale_transform(data_1, skewed1)
-    data_2, parameters2 = scale_transform(data_2, skewed2)
-    data_3, parameters3 = scale_transform(data_3, skewed3)
-
-    return (data_1[0], data_1[2]), (data_2[0], data_2[2]), (data_3[0], data_3[2])
+    #Log Transform skewed Data, scaling and normalizing using the same parameters of the training set
+    skewed1 = [2,4,6,10,15]
+    skewed2 = [2,3,5,7,10,13,15]
+    skewed3 = [1,2,3,4,7,8,11,14,17,22]
+    data_1 = scale_transform_test(data_1,parameters[0],skewed1)
+    data_2 = scale_transform_test(data_2,parameters[1],skewed2)
+    data_3 = scale_transform_test(data_3,parameters[2],skewed3)
+  
+    return (data_1[0],data_1[2]), (data_2[0],data_2[2]), (data_3[0],data_3[2])
