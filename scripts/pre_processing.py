@@ -153,23 +153,25 @@ def add_bias(X):
 
 # standardizing and applying log function on skew values, then normalizing the data
 # the parameters are kept to be reapplied on test set
-def scale_transform(data_n, skewed):
-
+def scale_transform(data_n,skewed):
     tx_n = data_n[0]
+    
     # Scaling Data to apply Log function
-    dividor = np.max(tx_n, axis=0)-np.min(tx_n, axis=0)
-    tx_n = (tx_n - np.min(tx_n, axis=0))/dividor
-    # Log transform skewed Data
-    tx_n[:, skewed] = np.log(tx_n[:, skewed]+1)
-    # Normalizing Data
+    minimum = np.min(tx_n,axis=0)
+    maximum = np.max(tx_n,axis=0)
+    dividor = maximum-minimum   
+    tx_n = (tx_n - minimum)/dividor
+    to_plot = np.copy(tx_n)
+    if (skewed):
+        tx_n[:,skewed]= np.log(tx_n[:,skewed]+1)
+        
     mean = np.mean(tx_n, axis=0)
     centered_data = tx_n - mean
     std = np.std(centered_data, axis=0)
     std_data = centered_data / std
-    data_n = (std_data, data_n[1], data_n[2])
-    parameters = (mean, std)
-
-    return data_n, parameters
+    data_n = (std_data,data_n[1],data_n[2])
+    parameters = (minimum,maximum,mean,std)
+    return data_n,parameters
 
 
 # standardize, apply log and normalize test set with the same parameters as the train set
